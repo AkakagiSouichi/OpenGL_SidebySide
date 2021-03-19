@@ -55,12 +55,12 @@ void cube(void)
 
 void idle(void)
 {
-    /* 変更なし */
+    glutPostRedisplay();
 }
 
 void display(void)
 {
-    static int r = 0; /* 回転角 */
+    static int r = 0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -74,23 +74,17 @@ void display(void)
     glViewport(0.0, 0.0, Width / 2.0, Height);//w:ウィンドウ幅，h:高さ
 
 
-    /* 光源の位置設定 */
     glLightfv(GL_LIGHT0, GL_POSITION, light0pos);
     glLightfv(GL_LIGHT1, GL_POSITION, light1pos);
 
-    /* モデルビュー変換行列の保存 */
     glPushMatrix();
 
-    /* 図形の回転 */
     glRotated((double)r, 0.0, 1.0, 0.0);
 
-    /* 図形の色 (赤)  */
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, red);
 
-    /* 図形の描画 */
     cube();
 
-    /* モデルビュー変換行列の復帰 */
     glPopMatrix();
 
     //右画面の設定
@@ -102,28 +96,21 @@ void display(void)
     gluLookAt(2.8, 4.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     glViewport(Width / 2.0, 0.0, Width / 2.0, Height);
 
-    /* 光源の位置設定 */
     glLightfv(GL_LIGHT0, GL_POSITION, light0pos);
     glLightfv(GL_LIGHT1, GL_POSITION, light1pos);
 
-    /* モデルビュー変換行列の保存 */
     glPushMatrix();
 
-    /* 図形の回転 */
     glRotated((double)r, 0.0, 1.0, 0.0);
 
-    /* 図形の色 (赤)  */
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, red);
 
-    /* 図形の描画 */
     cube();
 
-    /* モデルビュー変換行列の復帰 */
     glPopMatrix();
 
     glutSwapBuffers();
 
-    /* 一周回ったら回転角を 0 に戻す */
     if (++r >= 360) r = 0;
 }
 
@@ -132,15 +119,11 @@ void resize(int w, int h)
     Width = w;
     Height = h;
 
-    /* 透視変換行列の設定*/
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //gluPerspective(30.0, (double)w / (double)h, 1.0, 100.0);
 
-    /* モデルビュー変換行列の設定 */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    //gluLookAt(3.0, 4.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void mouse(int button, int state, int x, int y)
@@ -148,32 +131,12 @@ void mouse(int button, int state, int x, int y)
     switch (button) {
     case GLUT_LEFT_BUTTON:
         if (state == GLUT_DOWN) {
-            /* アニメーション開始 */
             glutIdleFunc(idle);
         }
         else {
-            /* アニメーション停止 */
             glutIdleFunc(0);
         }
         break;
-    case GLUT_RIGHT_BUTTON:
-        if (state == GLUT_DOWN) {
-            /* コマ送り (1ステップだけ進める) */
-            glutPostRedisplay();
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-void keyboard(unsigned char key, int x, int y)
-{
-    switch (key) {
-    case 'q':
-    case 'Q':
-    case '\033':  /* '\033' は ESC の ASCII コード */
-        exit(0);
     default:
         break;
     }
@@ -203,7 +166,6 @@ int main(int argc, char* argv[])
     glutDisplayFunc(display);
     glutReshapeFunc(resize);
     glutMouseFunc(mouse);
-    glutKeyboardFunc(keyboard);
     init();
     glutMainLoop();
     return 0;
